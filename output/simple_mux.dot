@@ -1,0 +1,63 @@
+digraph VerilogPDG {
+  rankdir=LR;
+  graph [fontname="Consolas"];
+  node [shape=ellipse, fontname="Consolas", fontsize=11];
+  edge [fontname="Consolas", fontsize=10];
+
+  legend1 [label="Thick red dashed = control dependence", shape=box];
+  legend2 [label="Thin blue solid = data dependence", shape=box];
+
+  n0 [label="hw.constant\\n%true", shape=ellipse, style=filled, fillcolor="#f7c6c7"];
+  n1 [label="hw.constant\\n%c-1_i4", shape=ellipse, style=filled, fillcolor="#f7c6c7"];
+  n2 [label="hw.constant\\n%c1_i4", shape=ellipse, style=filled, fillcolor="#f7c6c7"];
+  n3 [label="hw.constant\\n%c0_i4", shape=ellipse, style=filled, fillcolor="#f7c6c7"];
+  n4 [label="comb.add\\n%0", shape=ellipse];
+  in0 [label="%count", shape=oval];
+  n5 [label="comb.add\\n%1", shape=ellipse];
+  n6 [label="comb.xor\\n%2", shape=ellipse];
+  in1 [label="%reset", shape=oval];
+  n7 [label="comb.and\\n%3", shape=ellipse];
+  in2 [label="%enable", shape=oval];
+  n8 [label="comb.and\\n%4", shape=ellipse];
+  in3 [label="%up_down", shape=oval];
+  n9 [label="comb.mux\\n%5", shape=ellipse, style=filled, fillcolor="#fff2cc"];
+  n10 [label="comb.xor\\n%6", shape=ellipse];
+  n11 [label="comb.and\\n%7", shape=ellipse];
+  n12 [label="comb.mux\\n%8", shape=ellipse, style=filled, fillcolor="#fff2cc"];
+  n13 [label="seq.to_clock\\n%9", shape=ellipse];
+  in4 [label="%clk", shape=oval];
+  n14 [label="comb.or\\n%10", shape=ellipse];
+  n15 [label="comb.mux\\n%11", shape=ellipse, style=filled, fillcolor="#fff2cc"];
+  n16 [label="seq.firreg\\n%count", shape=ellipse, style=filled, fillcolor="#d9eaf7"];
+  n17 [label="hw.output", shape=ellipse, style=filled, fillcolor="#e6ddff"];
+
+  in0 -> n4 [label="data", color="blue", penwidth=1];
+  n2 -> n4 [label="data", color="blue", penwidth=1];
+  in0 -> n5 [label="data", color="blue", penwidth=1];
+  n1 -> n5 [label="data", color="blue", penwidth=1];
+  in1 -> n6 [label="data", color="blue", penwidth=1];
+  n0 -> n6 [label="data", color="blue", penwidth=1];
+  in2 -> n7 [label="data", color="blue", penwidth=1];
+  n6 -> n7 [label="data", color="blue", penwidth=1];
+  in3 -> n8 [label="data", color="blue", penwidth=1];
+  n7 -> n8 [label="data", color="blue", penwidth=1];
+  n8 -> n9 [label="control", color="red", style="dashed", penwidth=3];
+  n4 -> n9 [label="data", color="blue", penwidth=1];
+  n3 -> n9 [label="data", color="blue", penwidth=1];
+  in3 -> n10 [label="data", color="blue", penwidth=1];
+  n0 -> n10 [label="data", color="blue", penwidth=1];
+  n10 -> n11 [label="data", color="blue", penwidth=1];
+  n7 -> n11 [label="data", color="blue", penwidth=1];
+  n11 -> n12 [label="control", color="red", style="dashed", penwidth=3];
+  n5 -> n12 [label="data", color="blue", penwidth=1];
+  n9 -> n12 [label="data", color="blue", penwidth=1];
+  in4 -> n13 [label="data", color="blue", penwidth=1];
+  in1 -> n14 [label="data", color="blue", penwidth=1];
+  in2 -> n14 [label="data", color="blue", penwidth=1];
+  n14 -> n15 [label="control", color="red", style="dashed", penwidth=3];
+  n12 -> n15 [label="data", color="blue", penwidth=1];
+  in0 -> n15 [label="data", color="blue", penwidth=1];
+  n15 -> n16 [label="data", color="blue", penwidth=1];
+  n13 -> n16 [label="data", color="blue", penwidth=1];
+  n16 -> n17 [label="data", color="blue", penwidth=1];
+}
