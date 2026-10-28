@@ -84,3 +84,28 @@ Copy this section for each new milestone:
 - **Status:** Not started / In progress / Implemented / Validated
 - **Open issues:**
 - **Next action:**
+
+
+## Later experiments — V4 to V6
+
+The working notes for V4–V6 are summarized in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md), with commands in [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md). The exact V4/V5 scripts and V6 RTL/testbench artifacts are not yet in this repository snapshot, so these measurements are labeled as working-note-reported rather than independently reproduced.
+
+### V4 — reduction experiment
+- **Reported files:** `reduction_analysis_v4.py`, `mixed_test_hw.mlir`, `mixed_test_reduced_v4.mlir`.
+- **Observed result:** Not confirmed from the available repository snapshot.
+- **Status:** Historical experiment noted; artifacts/results need upload and verification.
+
+### V5 — mixed sequential/combinational reduction
+- **Reported criterion:** RTL `<status,3>` mapped to SSA `<%7,3>`.
+- **Reported counts:** 20 original MLIR operations, 13 retained, 7 removed (35% of counted operations).
+- **Interpretation:** Operation-count metric only; not a gate-area, power or timing estimate.
+- **Status:** Working-note-reported; scripts and input/output MLIR are not yet in this repository snapshot.
+
+### V6 — lower and simulate
+- **Reported workflow:** lower reduced MLIR with `--lower-seq-to-sv`, export SystemVerilog, then compile and simulate the original and reduced designs with Icarus Verilog.
+- **Reported result:** PASS for status outputs over the test sequences exercised by the recorded testbench.
+- **Limitation:** Simulation agreement for tested sequences is not a formal equivalence proof.
+- **Status:** Working-note-reported; exact generated files and testbench still need to be uploaded for reproduction.
+
+### Next concrete task
+Upload the actual V4/V5 scripts, helper modules, source RTL, intermediate MLIR, reduced MLIR, reduced generated SystemVerilog and `tb_compare.sv`. Then rerun from a clean checkout and replace note-reported results with verified results and logs.
