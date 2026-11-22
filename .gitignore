@@ -3,3 +3,10 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+# Generated experiment/build artifacts
+*.vvp
+*.vcd
+*.log
+*.exe
+build/
+experiments/*/test_output.txt
