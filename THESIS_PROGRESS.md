@@ -109,3 +109,27 @@ The working notes for V4–V6 are summarized in [docs/DEVELOPMENT_HISTORY.md](do
 
 ### Next concrete task
 Upload the actual V4/V5 scripts, helper modules, source RTL, intermediate MLIR, reduced MLIR, reduced generated SystemVerilog and `tb_compare.sv`. Then rerun from a clean checkout and replace note-reported results with verified results and logs.
+
+
+## Step 7a — Remove environment-specific CIRCT path dependency
+- **Goal:** Make CIRCT tool discovery portable instead of requiring the developer-specific `F:\Projects\circt\build\bin\circt-opt.exe` path.
+- **Changes:** Added `src/circt_tools.py` with explicit-path, `CIRCT_OPT` environment-variable, and PATH-based resolution.
+- **Validation:** The helper logic is source-level only in this commit; the full `cycle_slice_tool.py` integration still needs to be applied and tested against the working ZIP implementation.
+- **Status:** In progress.
+- **Open issues:** The current working slicer in the thesis source archive still contains its historical hard-coded `CIRCT_OPT` constant. It must be updated to accept `--circt-opt` and use the resolver for validation and SystemVerilog generation.
+- **Next action:** Integrate the resolver into `cycle_slice_tool.py`, then run `--help` and the verified `data_copy` benchmark with an explicit CIRCT path.
+
+
+## Step 7 — Validate data_copy cycle-3 benchmark
+- **Goal:** Validate the cycle-aware backward slice on a mixed sequential/combinational RTL design.
+- **Input:** `examples/mixed_test.sv` and generated `examples/mixed_test_hw.mlir`.
+- **Criterion:** RTL `<data_copy,3>`, mapped to CIRCT SSA `<%data_copy,3>`.
+- **Observed traversal:** `%data_copy@3 → %10@2 → %data_in@2, %c0_i4@2, %rst@2`.
+- **Semantic keep:** `%10`, `%c0_i4`, `%data_copy`, `%data_in`, `%rst`.
+- **Structural keep:** `%4` (`seq.to_clock %clk`).
+- **Result:** 20 original operations, 4 retained operations, 16 removed; reported potential operation-count reduction 80.00%.
+- **Validation:** CIRCT reduced-MLIR validation PASS; CIRCT SystemVerilog generation PASS.
+- **Artifacts:** `experiments/data_copy_cycle3/reduced.mlir`, `reduced.sv`, and `validation.txt`.
+- **Status:** Validated for this benchmark.
+- **Limitations:** This is one benchmark and one temporal criterion. The result is simulation/prototype evidence, not a formal equivalence proof or a claim of general minimality.
+- **Next action:** Integrate the portable CIRCT executable resolver into the main slicer, then add a multi-register sequential benchmark to validate multi-cycle propagation.
