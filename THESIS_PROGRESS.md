@@ -118,3 +118,18 @@ Upload the actual V4/V5 scripts, helper modules, source RTL, intermediate MLIR, 
 - **Status:** In progress.
 - **Open issues:** The current working slicer in the thesis source archive still contains its historical hard-coded `CIRCT_OPT` constant. It must be updated to accept `--circt-opt` and use the resolver for validation and SystemVerilog generation.
 - **Next action:** Integrate the resolver into `cycle_slice_tool.py`, then run `--help` and the verified `data_copy` benchmark with an explicit CIRCT path.
+
+
+## Step 7 — Validate data_copy cycle-3 benchmark
+- **Goal:** Validate the cycle-aware backward slice on a mixed sequential/combinational RTL design.
+- **Input:** `examples/mixed_test.sv` and generated `examples/mixed_test_hw.mlir`.
+- **Criterion:** RTL `<data_copy,3>`, mapped to CIRCT SSA `<%data_copy,3>`.
+- **Observed traversal:** `%data_copy@3 → %10@2 → %data_in@2, %c0_i4@2, %rst@2`.
+- **Semantic keep:** `%10`, `%c0_i4`, `%data_copy`, `%data_in`, `%rst`.
+- **Structural keep:** `%4` (`seq.to_clock %clk`).
+- **Result:** 20 original operations, 4 retained operations, 16 removed; reported potential operation-count reduction 80.00%.
+- **Validation:** CIRCT reduced-MLIR validation PASS; CIRCT SystemVerilog generation PASS.
+- **Artifacts:** `experiments/data_copy_cycle3/reduced.mlir`, `reduced.sv`, and `validation.txt`.
+- **Status:** Validated for this benchmark.
+- **Limitations:** This is one benchmark and one temporal criterion. The result is simulation/prototype evidence, not a formal equivalence proof or a claim of general minimality.
+- **Next action:** Integrate the portable CIRCT executable resolver into the main slicer, then add a multi-register sequential benchmark to validate multi-cycle propagation.
