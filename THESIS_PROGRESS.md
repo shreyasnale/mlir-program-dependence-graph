@@ -109,3 +109,12 @@ The working notes for V4–V6 are summarized in [docs/DEVELOPMENT_HISTORY.md](do
 
 ### Next concrete task
 Upload the actual V4/V5 scripts, helper modules, source RTL, intermediate MLIR, reduced MLIR, reduced generated SystemVerilog and `tb_compare.sv`. Then rerun from a clean checkout and replace note-reported results with verified results and logs.
+
+
+## Step 7a — Remove environment-specific CIRCT path dependency
+- **Goal:** Make CIRCT tool discovery portable instead of requiring the developer-specific `F:\Projects\circt\build\bin\circt-opt.exe` path.
+- **Changes:** Added `src/circt_tools.py` with explicit-path, `CIRCT_OPT` environment-variable, and PATH-based resolution.
+- **Validation:** The helper logic is source-level only in this commit; the full `cycle_slice_tool.py` integration still needs to be applied and tested against the working ZIP implementation.
+- **Status:** In progress.
+- **Open issues:** The current working slicer in the thesis source archive still contains its historical hard-coded `CIRCT_OPT` constant. It must be updated to accept `--circt-opt` and use the resolver for validation and SystemVerilog generation.
+- **Next action:** Integrate the resolver into `cycle_slice_tool.py`, then run `--help` and the verified `data_copy` benchmark with an explicit CIRCT path.
