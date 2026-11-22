@@ -1,0 +1,45 @@
+CYCLE-AWARE RTL SLICING TOOL
+
+Input MLIR       : mixed_test_hw.mlir
+Criterion output : data_copy
+Criterion cycle  : 3
+Minimum cycle    : 0
+
+Original operations : 20
+
+RTL slicing criterion:
+    <data_copy,3>
+
+CIRCT SSA criterion:
+    <%data_copy,3>
+
+Semantic keep:
+    %10
+    %c0_i4
+    %data_copy
+    %data_in
+    %rst
+
+Structural keep:
+    %4
+
+Final retained operations:
+    %c0_i4 = hw.constant 0 : i4
+    %4 = seq.to_clock %clk
+    %10 = comb.mux %rst, %c0_i4, %data_in : i4
+    %data_copy = seq.firreg %10 clock %4 : i4
+
+CIRCT VALIDATION: PASS
+Reduced MLIR is valid.
+
+CIRCT SV generation: PASS
+
+Original operations        : 20
+Semantic relevant          : 5
+Structural dependencies    : 1
+Final retained operations  : 4
+Final removable operations : 16
+Potential reduction        : 80.00%
+
+Validation status : PASS
+SystemVerilog generation : PASS
