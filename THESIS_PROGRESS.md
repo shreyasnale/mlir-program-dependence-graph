@@ -84,3 +84,38 @@ Copy this section for each new milestone:
 - **Status:** Not started / In progress / Implemented / Validated
 - **Open issues:**
 - **Next action:**
+
+### Step 8 — Fix dangling-SSA bug in reduced-MLIR generation and validate cycle-bounded reduction
+- **Goal:** Fix the cases where `generate_reduced_mlir` kept an operation (usually a `seq.firreg`) that referenced an operand whose defining operation had been cut by the cycle bound, producing MLIR that failed `circt-opt` validation. Then confirm cycle-bounded slicing actually reduces finite-depth logic and correctly does *not* reduce feedback logic.
+- **Changes:**
+  - `src/cycle_slicing/cycle_slice_tool_v4_portfix.py`: in `generate_reduced_mlir`, any SSA value used by a retained operation but no longer produced within the retained set is promoted to a new module input port (same SSA name, inferred type from the original IR) instead of being left dangling.
+  - Added two benchmark designs: `benchmarks/mlir/mixed_test_hw.mlir` / `benchmarks/sv/mixed_test.sv` (feedback counter `count`, plus `data_copy`, `debug_value`, `status`) and `benchmarks/mlir/temporal_chain_hw.mlir` / `benchmarks/sv/temporal_chain.sv` (3-stage register chain `data -> reg_a -> reg_b -> reg_c -> output_value`, no feedback).
+- **Validation command/test:** `python cycle_slice_tool_v4_portfix.py --mlir <file> --output <signal> --cycle <k>` for every cycle 0–5 on both designs, checked against real `circt-opt` (not a hand-rolled checker).
+- **Observed result:**
+
+  `temporal_chain` / `output_value` (14 original ops, depth 3, no feedback):
+
+  | cycle | ops kept | reduction |
+  |---|---|---|
+  | 0 | 2 | 85.71% |
+  | 1 | 9 | 35.71% |
+  | 2 | 12 | 14.29% |
+  | 3 | 14 | 0% |
+  | 4 | 14 | 0% |
+  | 5 | 14 | 0% |
+
+  `mixed_test` / `count` (20 original ops, register with feedback):
+
+  | cycle | ops kept | reduction |
+  |---|---|---|
+  | 0 | 2 | 90% |
+  | 1 | 11 | 45% |
+  | 3 | 11 | 45% |
+
+  All cases: `CIRCT VALIDATION: PASS`, `CIRCT SV generation: PASS`.
+- **Status:** Implemented, validated against `circt-opt`.
+- **Open issues:**
+  - `seq.firreg ... reset sync %rst, %val` (reset as an explicit register operand) is not yet followed as a dependency — only designs where `circt-verilog` lowers reset into a `comb.mux` are correctly handled.
+  - Only operation-count reduction and syntactic (`circt-opt`) validity are shown. Behavioral equivalence between original and reduced design up to cycle k (e.g. via a miter + `circt-bmc`, or simulation) is not yet implemented — this is the next milestone.
+  - Parser is still text/regex-based (`re.findall` over MLIR text), not CIRCT's own SSA/operation API, per the exposé's stated methodology.
+- **Next action:** Implement a correctness check (miter comparing original vs. reduced design, formal via `circt-bmc -b k` or simulation) so that reduction results can be reported alongside a behavior-preservation guarantee, not operation counts alone.
